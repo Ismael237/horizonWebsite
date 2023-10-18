@@ -29,7 +29,7 @@ function Contact() {
                 justifyContent="space-between"
                 alignItems={{ base: "flex-start", lg: "center" }}
                 position="relative"
-                top={{ base: "-250px", lg: "-100px" }}
+                top={{ base: "-210px", lg: "-100px" }}
                 gap={12}
                 px={{ base: "0px", md: "80px", lg: "124px", xl: "156px" }}
             >
