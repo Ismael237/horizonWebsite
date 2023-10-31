@@ -1,12 +1,12 @@
-import { Box, Button, Flex, FormControl, FormLabel, Heading, Text, Textarea } from "@chakra-ui/react";
+import { Box, Button, Flex, FormControl, FormErrorMessage, FormLabel, Heading, Text, Textarea } from "@chakra-ui/react";
 import emailjs from '@emailjs/browser';
 import Header from "../../components/Header/Header";
 import Social from "../../components/Social/Social";
 import Field from "../../components/Field/Field";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Contact() {
-    
+
     const initialFormData = {
         name: 'John Doe',
         email: 'johndoe@example.com',
@@ -15,6 +15,7 @@ function Contact() {
     }
 
     const [formData, setFormData] = useState(initialFormData);
+    const [isValid, setIsValid] = useState(true);
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
     const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -27,14 +28,16 @@ function Contact() {
 
     const sendEmail = async (e) => {
         e.preventDefault();
-        const isValid = Object.values(formData).every((value) => value && value.trim() !== '');
-        if (isValid) {
+        const localIsValid = Object.values(formData).every((value) => value && value.trim() !== '');
+        if (localIsValid) {
             try {
                 const res = await emailjs.send(serviceId, templateId, formData, publicKey)
                 console.log(res.text);
             } catch (error) {
                 console.log(error.text);
             }
+        } else {
+            setIsValid(false);
         }
     };
 
@@ -135,6 +138,9 @@ function Contact() {
                                 value={formData.description}
                                 onChange={handleFormChange}
                             />
+                        </FormControl>
+                        <FormControl isInvalid={!isValid}>
+                            {!isValid && <FormErrorMessage>Vous devez renseigner tout les champ.</FormErrorMessage>}
                         </FormControl>
                         <Button colorScheme="primary" onClick={sendEmail}>Envoyez</Button>
                     </Flex>
