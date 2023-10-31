@@ -1,8 +1,44 @@
-import { Box, Button, Flex, FormControl, FormLabel, Heading, Input, Link, Stack, Text, Textarea } from "@chakra-ui/react";
+import { Box, Button, Flex, FormControl, FormLabel, Heading, Text, Textarea } from "@chakra-ui/react";
+import emailjs from '@emailjs/browser';
 import Header from "../../components/Header/Header";
 import Social from "../../components/Social/Social";
+import Field from "../../components/Field/Field";
+import { useState } from "react";
 
 function Contact() {
+    
+    const initialFormData = {
+        name: 'John Doe',
+        email: 'johndoe@example.com',
+        project_name: 'Projet XYZ',
+        description: `Un projet de démonstration pour tester l'envoi d'e-mails.`,
+    }
+
+    const [formData, setFormData] = useState(initialFormData);
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+
+    const handleFormChange = (e) => {
+        const { name, value } = e.target;
+        const updatedForm = { ...formData, [name]: value };
+        setFormData(updatedForm);
+    }
+
+    const sendEmail = async (e) => {
+        e.preventDefault();
+        const isValid = Object.values(formData).every((value) => value && value.trim() !== '');
+        if (isValid) {
+            try {
+                const res = await emailjs.send(serviceId, templateId, formData, publicKey)
+                console.log(res.text);
+            } catch (error) {
+                console.log(error.text);
+            }
+        }
+    };
+
+
     return (
         <Flex flexDirection="column">
             <Box
@@ -60,45 +96,59 @@ function Contact() {
                     w={{ base: "100%", lg: "500px" }}
                     rounded={{ base: "3xl", md: "2xl" }}
                     bgColor="softWhite.500"
-                    border="1px solid" 
+                    border="1px solid"
                     borderColor="blackAlpha.400"
                     px={{ base: 6, lg: 14 }}
                     py={{ base: 12, lg: 14 }}
                 >
                     <Flex flexDirection="column" gap={4}>
-                        <FormControl id="Nom">
-                            <FormLabel>Votre nom</FormLabel>
-                            <Input type="text" bgColor="white" h="52px" />
-                        </FormControl>
-                        <FormControl id="E-mail">
-                            <FormLabel>Votre adresse E-mail</FormLabel>
-                            <Input type="text" bgColor="white" h="52px" />
-                        </FormControl>
-                        <FormControl id="projet">
-                            <FormLabel>Le nom de votre projet</FormLabel>
-                            <Input type="text" bgColor="white" h="52px" />
-                        </FormControl>
-                        <FormControl id="Nom">
+                        <Field
+                            label="Votre nom"
+                            inputName="name"
+                            type="text"
+                            error=""
+                            value={formData.name}
+                            onChange={handleFormChange}
+                        />
+                        <Field
+                            label="Votre adresse E-mail"
+                            inputName="email"
+                            type="email"
+                            error=""
+                            value={formData.email}
+                            onChange={handleFormChange}
+                        />
+                        <Field
+                            label="Le nom de votre projet"
+                            inputName="project_name"
+                            type="text"
+                            error=""
+                            value={formData.project_name}
+                            onChange={handleFormChange}
+                        />
+                        <FormControl>
                             <FormLabel>Description votre projet</FormLabel>
-                            <Textarea type="text" bgColor="white" />
+                            <Textarea
+                                type="text"
+                                bgColor="white"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleFormChange}
+                            />
                         </FormControl>
-                        <FormControl id="Nom">
-                            <FormLabel>Pieces jointes</FormLabel>
-                            <Input type="text" bgColor="white" h="52px" />
-                        </FormControl>
-                        <Button colorScheme="primary">Envoyez</Button>
+                        <Button colorScheme="primary" onClick={sendEmail}>Envoyez</Button>
                     </Flex>
                 </Box>
-                <Flex 
-                    flexDirection="column" gap={2} 
+                <Flex
+                    flexDirection="column" gap={2}
                     display={{ base: "flex", lg: "none" }}
                     px={{ base: "16px", md: "80px" }}
                 >
-                        <Heading as="h3" fontSize="md">
-                            Autres moyen
-                        </Heading>
-                        <Text>horizon@gmail.com</Text>
-                        <Text>655059273 / 655059273</Text>
+                    <Heading as="h3" fontSize="md">
+                        Autres moyen
+                    </Heading>
+                    <Text>horizon@gmail.com</Text>
+                    <Text>655059273 / 655059273</Text>
                 </Flex>
             </Flex>
         </Flex>
